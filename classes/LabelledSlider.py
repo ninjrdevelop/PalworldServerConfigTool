@@ -4,11 +4,19 @@ import customtkinter as ctk
 
 
 class LabelledSlider(ctk.CTkFrame):
+    prefix = ''
+    suffix = ''
+    isPercentage = False
+
     def __init__(self, master, **kwargs):
         super().__init__(master)
 
+        self.suffix = kwargs['suffix'] if 'suffix' in kwargs else ''
+        self.prefix = kwargs['prefix'] if 'prefix' in kwargs else ''
+        self.isPercentage = kwargs['isPercentage'] if 'isPercentage' in kwargs else ''
+
         #
-        self.label = ctk.CTkLabel(self, text=fmt(kwargs['value']))
+        self.label = ctk.CTkLabel(self, text=self.fmt(kwargs['value']))
         self.label.pack()
 
         #
@@ -20,13 +28,16 @@ class LabelledSlider(ctk.CTkFrame):
         self.slider.pack()
 
     def _sliderChange(self, value):
-        self.label.configure(text=fmt(value))
-
-        print(self.get())
+        self.label.configure(text=self.fmt(value))
 
     def get(self):
-        return int(self.slider.get() * 100) / 100
+        if self.isPercentage:
+            return int(self.slider.get() * 100) / 100
+        else:
+            return self.slider.get()
 
-
-def fmt(value):
-    return f'{int(value * 100)} %'
+    def fmt(self, value):
+        if self.isPercentage:
+            return f'{self.prefix}{int(value * 100)}{self.suffix}'
+        else:
+            return f'{self.prefix}{value}{self.suffix}'
